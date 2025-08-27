@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "module": "nodenext",       // ✅ For ESM
+    "target": "esnext",         // ✅ Modern JS
+    "moduleResolution": "nodenext", // ✅ For ESM resolution
+    "esModuleInterop": true,    // ✅ For common packages
+    "resolveJsonModule": true,  // ✅ Allow JSON imports
+
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "strict": true,
+    "jsx": "react-jsx",
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "noUncheckedSideEffectImports": true,
+    "moduleDetection": "force",
+    "skipLibCheck": true
+  },
+  "include": ["src"]
+}
