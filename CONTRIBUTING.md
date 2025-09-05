@@ -8,7 +8,7 @@ We welcome contributions from developers of all levels — whether you're fixing
 ## 📌 How to Contribute
 1. **Fork the repo**  
    ```bash 
-    git fork https://github.com/yourname/music-backend.git
+    git fork https://github.com/SurajKhonde/VibeBox
    cd serverside 
    cd clientside 
 2. **Create a new branch**
