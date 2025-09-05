@@ -30,7 +30,10 @@ router.post("/login", async (req, res) => {
   });
 
   res.cookie("token", token, { httpOnly: true });
-  res.redirect("/dashboard");
+  res.status(200).json({"message":"User sign in sucessfully",
+    role:user.role,
+    
+  });
 });
 
 // Google Auth
