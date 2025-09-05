@@ -31,7 +31,8 @@ This project is a playground for developers who want to **learn, contribute, and
 
 ## ✅ Features Report
 
-
+We maintain a detailed list of all completed, in-progress, and upcoming features.  
+👉 Check it out here: [FEATURES.md](./FEATURES.md)  
 ---
 
 
@@ -48,8 +49,7 @@ This project is a playground for developers who want to **learn, contribute, and
 ## 📦 Getting Started
 1. Clone the repo:
    ```bash
-   git clone https://github.com/yourname/music-backend.git
-   cd music-backend
+   git clone https://github.com/SurajKhonde/VibeBox
 2.Install dependencies:
    ```bash
      npm install
