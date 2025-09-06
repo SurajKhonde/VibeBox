@@ -1,6 +1,7 @@
 import type{ Request, Response } from "express";
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 export const createUser = async (req: Request, res: Response) => {
   try {
     const user = new User(req.body);
@@ -59,6 +60,31 @@ export const loginUser = async (req: Request, res: Response) => {
     } catch (error) {
       console.error("Login error:", error);
       res.status(500).json({ message: "Server error" });
+    }
+  };
+
+    
+  export const changePassword = async (req: Request, res: Response) => {
+    try {
+      const { oldPassword, newPassword } = req.body;
+      const userId = (req as any).user.id;
+      const user = await User.findById(userId);
+      if (!user || !user.password) {
+        return res.status(404).json({ message: "User not found or password not set" });
+      }
+  
+      const isMatch = await bcrypt.compare(oldPassword, user.password);
+      if (!isMatch) {
+        return res.status(401).json({ message: "Old password is incorrect" });
+      }
+  
+      user.password = await bcrypt.hash(newPassword, 10);
+      await user.save();
+  
+      return res.status(200).json({ message: "Password changed successfully" });
+    } catch (error) {
+      console.error("Error changing password:", error);
+      return res.status(500).json({ message: "Server error", error });
     }
   };
   

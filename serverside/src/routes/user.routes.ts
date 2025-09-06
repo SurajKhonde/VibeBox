@@ -5,6 +5,10 @@ import path from "path";
 import User from "../models/User.js";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
+import { changePassword } from "../controllers/user.controller.js";
+import { isValidUser } from "../validators/uservalidate.js";
+import { passwordSchema } from "../validators/authSchemas.js";
+import { validate } from "../middlewares/validate.js";
 
 // Create __dirname equivalent
 const __filename = fileURLToPath(import.meta.url);
@@ -54,7 +58,7 @@ router.get(
       expiresIn: "1d",
     });
     res.cookie("token", token, { httpOnly: true });
-    res.redirect("/dashboard");
+    res.redirect("/api/users/genres");
   }
 );
 
@@ -71,9 +75,28 @@ router.post("/set-password", async (req, res) => {
   if (!user) return res.status(404).send("User not found");
   user.password = password;
   await user.save();
-  res.send("Password set successfully! You can now log in.");
+  res.redirect(`/api/users/genres?userId=${user._id}`);
 });
-router.get("/test", (req, res) => {
-    res.json({ message: "Swagger route working!" });
-  });
+router.get("/genres", (req, res) => {
+  let filePath = path.join(__dirname, "../views/genres.html");
+  res.sendFile(filePath);
+});
+router.post("/genres", async (req, res) => {
+  try {
+    const { userId, selectedGenres } = req.body; // Expect array of genres
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).send("User not found");
+
+    user.favoriteGenres = selectedGenres;
+    await user.save();
+
+    res.json({ message: "Genres updated successfully!", favoriteGenres: user.favoriteGenres });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to update genres" });
+  }
+});
+
+router.post("/change-password",isValidUser,validate(passwordSchema),changePassword);
+
 export default router;

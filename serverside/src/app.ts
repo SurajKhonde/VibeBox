@@ -17,6 +17,7 @@ import userRoutes from "./routes/user.routes.js";
 import uploadRoutes from "./routes/s3.js";
 import artistHandlers from "./routes/artistRoutes.js";
 import MusicHandler from "./routes/songsRoutes.js";
+import listener from "./routes/listenerRoutes.js"
 dotenv.config();
 const app: Application = express();
 app.use(cors());
@@ -40,8 +41,9 @@ swaggerDocs(app);
 // Routes
 app.use("/api/users", userRoutes);
 app.use("/api/upload", uploadRoutes);
-app.use('/api/artist',artistHandlers);
-app.use('/api/music',MusicHandler)
+app.use('/admin',artistHandlers);
+app.use('/admin',MusicHandler);
+app.use('/listener',listener)
 
 export default app;
 

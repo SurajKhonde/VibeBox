@@ -50,48 +50,51 @@ export const uploadSong = async (req: Request, res: Response): Promise<Response>
   }
 };
 
-export const getSong = async (req: Request, res: Response): Promise<Response> => {
-    try {
-      const { id } = req.params;
+// 1. Get all songs (lightweight list, no signed URL)
+export const listSongs = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const songs = await Song.find({})
+      .select("_id name singers genres releaseDate") // only needed fields
+      .populate("singers", "name"); // only singer name
 
-      const song = await Song.findById(id)
-        .populate("singers")  
-        // .populate("composers.artistId")
-        // .populate("albums.albumId");
-  
-      if (!song) {
-        return res.status(404).json({ success: false, message: "Song not found" });
-      }
-  
-      // Assume first file is the main audio
-      const file = song.files[0];
-      if (!file) {
-        return res.status(400).json({ success: false, message: "No audio file found" });
-      }
-  
-      // Create signed URL (expires in 15 minutes = 900 seconds)
-      const command = new GetObjectCommand({
-        Bucket: bucket,
-        Key: file.url, 
-      });
-  
-      const signedUrl = await getSignedUrl(s3, command, { expiresIn: 900 });
-  
-      return res.json({
-        success: true,
-        song: {
-          _id: song._id,
-          name: song.name,
-          singers: song.singers,
-          composers: song.composers,
-          albums: song.albums,
-          genres: song.genres,
-          releaseDate: song.releaseDate,
-          streamUrl: signedUrl, // 🎧 temporary URL
-        },
-      });
-    } catch (err) {
-      console.error("Get song error:", err);
-      return res.status(500).json({ success: false, message: "Failed to fetch song" });
+    return res.json({
+      success: true,
+      songs,
+    });
+  } catch (err) {
+    console.error("List songs error:", err);
+    return res.status(500).json({ success: false, message: "Failed to fetch songs" });
+  }
+};
+
+// 2. Get signed stream URL for a single song
+export const playSong = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const { id } = req.params;
+
+    const song = await Song.findById(id);
+    if (!song) {
+      return res.status(404).json({ success: false, message: "Song not found" });
     }
-  };
+
+    const file = song.files[0];
+    if (!file) {
+      return res.status(400).json({ success: false, message: "No audio file found" });
+    }
+
+    const command = new GetObjectCommand({
+      Bucket: bucket,
+      Key: file.url,
+    });
+
+    const signedUrl = await getSignedUrl(s3, command, { expiresIn: 900 }); // 15 min
+
+    return res.json({
+      success: true,
+      streamUrl: signedUrl, 
+    });
+  } catch (err) {
+    console.error("Play song error:", err);
+    return res.status(500).json({ success: false, message: "Failed to generate stream URL" });
+  }
+};
